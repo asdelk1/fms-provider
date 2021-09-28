@@ -1,7 +1,9 @@
 package com.owerp.fmsprovider.system.service;
 
 import com.owerp.fmsprovider.system.model.data.User;
+import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.parameters.P;
@@ -21,6 +23,8 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository repo;
     private final BCryptPasswordEncoder encoder;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
         this.repo = repo;
@@ -33,15 +37,20 @@ public class UserService implements UserDetailsService {
         if (user.isPresent()) {
             Set<SimpleGrantedAuthority> authorities = new HashSet<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            org.springframework.security.core.userdetails.User userDetails = new org.springframework.security.core.userdetails.User(
+            return new org.springframework.security.core.userdetails.User(
                     user.get().getUsername(),
                     user.get().getPassword(),
                     authorities
             );
-            return userDetails;
         } else {
             throw new UsernameNotFoundException(username + " is not a valid user.");
         }
+    }
+
+    public UserDTO addUser(UserDTO userDTO){
+        User user = new User();
+        this.repo.save(user);
+        return this.modelMapper.map(user, UserDTO.class);
     }
 
     @PostConstruct
