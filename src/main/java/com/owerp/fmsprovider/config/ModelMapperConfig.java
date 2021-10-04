@@ -1,5 +1,6 @@
-package com.owerp.fmsprovider.config.security.config;
+package com.owerp.fmsprovider.config;
 
+import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class ModelMapperConfig {
 
     @Bean
-    public ModelMapper getModelMapper(){
-        return new ModelMapper();
+    public EntityModelMapper getEntityModelMapper(){
+        return new EntityModelMapper();
     }
 
 }
