@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,4 +21,6 @@ public class User implements Serializable {
     private String lastName;
     private String epfNo;
     private boolean active;
+    @ManyToMany(mappedBy = "users")
+    private Set<UserGroup> groups;
 }
