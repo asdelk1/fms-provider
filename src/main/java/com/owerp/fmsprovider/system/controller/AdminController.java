@@ -34,7 +34,7 @@ public class AdminController {
     @PostMapping("/generate-token")
     public ResponseEntity<ApiResponse> generateToken(@RequestBody UserCredential credential){
 
-        Authentication authToken = new UsernamePasswordAuthenticationToken(credential.getUsername(), credential.getPassword());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(credential.getEmail(), credential.getPassword());
         Authentication authentication = this.authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = this.tokenProvider.generateToken(authentication);

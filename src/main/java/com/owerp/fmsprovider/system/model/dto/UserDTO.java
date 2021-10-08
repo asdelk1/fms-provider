@@ -12,4 +12,9 @@ public class UserDTO implements Serializable {
     private Long id;
     private String username;
     private String password;
+    private String firstName;
+    private String lastName;
+    private String epfNo;
+    private String email;
+    private boolean active;
 }
