@@ -1,15 +1,16 @@
 package com.owerp.fmsprovider.system.model.data;
 
-import com.owerp.fmsprovider.system.model.data.User;
-import lombok.*;
-import org.hibernate.Hibernate;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "sys_user_group")
+@Table(name = "sys_user_group", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
 @Getter
 @Setter
 @ToString
@@ -26,6 +27,12 @@ public class UserGroup {
             joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
-    @ToString.Exclude
     private Set<User> users;
+    @ElementCollection
+    private Set<String> grantedPermissions;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id, this.name);
+    }
 }

@@ -11,5 +11,5 @@ public class UserGroupDTO {
     private Long id;
     private String name;
     private String description;
-    private Set<User> users;
+    private Set<UserDTO> users;
 }
