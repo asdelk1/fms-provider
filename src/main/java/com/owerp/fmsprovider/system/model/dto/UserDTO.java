@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,4 +18,5 @@ public class UserDTO implements Serializable {
     private String epfNo;
     private String email;
     private boolean active;
+    private Set<String> grantedPermissions;
 }
