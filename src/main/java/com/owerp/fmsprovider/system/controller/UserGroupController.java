@@ -37,36 +37,50 @@ public class UserGroupController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getUserGroup(@PathVariable long id){
+    public ResponseEntity<ApiResponse> getUserGroup(@PathVariable long id) {
         // TODO: add permission validation
         UserGroup ug = this.service.getUserGroup(id);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(ug, UserGroup.class)));
     }
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse>createUserGroup(@RequestBody UserGroupDTO dto){
+    public ResponseEntity<ApiResponse> createUserGroup(@RequestBody UserGroupDTO dto) {
         // TODO: add permission validation
         UserGroup ug = this.service.saveUserGroup(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED, ug));
     }
 
     @PostMapping("/{id}/add-users")
-    public ResponseEntity<ApiResponse> addUsers(@PathVariable long id, @RequestBody Set<UserDTO> users){
+    public ResponseEntity<ApiResponse> addUsers(@PathVariable long id, @RequestBody Set<UserDTO> users) {
         // TODO: add permission validation
         UserGroup ug = this.service.addUsers(id, users);
-        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, ug));
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(ug, UserDTO.class)));
     }
 
     @PostMapping("/{id}/remove-users")
-    public ResponseEntity<ApiResponse> removeUsers(@PathVariable long id, @RequestBody Set<UserDTO> users){
+    public ResponseEntity<ApiResponse> removeUsers(@PathVariable long id, @RequestBody Set<UserDTO> users) {
         // TODO: add permission validation
         UserGroup ug = this.service.deleteUsers(id, users);
-        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, ug));
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(ug, UserDTO.class)));
     }
 
     @GetMapping("/permissions")
     public ResponseEntity<ApiResponse> getPermissionList() {
         Set<String> permissionList = this.permissionService.getPermissions();
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, permissionList));
+    }
+
+    @PostMapping("/{userGroupId}/grant-permissions")
+    public ResponseEntity<ApiResponse> grantPermissions(@PathVariable long userGroupId, @RequestBody Set<String> permissions) {
+        // TODO: add permission validation
+        UserGroup group = this.service.addPermissions(userGroupId, permissions);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(group, UserGroupDTO.class)));
+    }
+
+    @PostMapping("/{userGroupId}/deny-permissions")
+    public ResponseEntity<ApiResponse> denyPermissions(@PathVariable long userGroupId, @RequestBody Set<String> permissions) {
+        // TODO: add permission validation
+        UserGroup group = this.service.removePermissions(userGroupId, permissions);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(group, UserGroupDTO.class)));
     }
 }

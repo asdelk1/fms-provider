@@ -54,4 +54,16 @@ public class UserGroupService {
         group.getUsers().removeAll(userEntities);
         return this.repo.save(group);
     }
+
+    public UserGroup addPermissions(Long groupId, Set<String> permissions){
+        UserGroup userGroup = this.getUserGroup(groupId);
+        userGroup.getGrantedPermissions().addAll(permissions);
+        return this.repo.save(userGroup);
+    }
+
+    public UserGroup removePermissions(Long groupId, Set<String> permissions){
+        UserGroup userGroup = this.getUserGroup(groupId);
+        userGroup.getGrantedPermissions().removeAll(permissions);
+        return this.repo.save(userGroup);
+    }
 }
