@@ -21,4 +21,8 @@ public class UserPermissionService {
         this.permissions.add(UserPermission.USER_GROUP_EDIT);
         this.permissions.add(UserPermission.USER_GROUP_DELETE);
     }
+
+    public Set<String> getPermissions() {
+        return permissions;
+    }
 }

@@ -5,6 +5,7 @@ import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.model.dto.UserGroupDTO;
 import com.owerp.fmsprovider.system.service.UserGroupService;
+import com.owerp.fmsprovider.system.service.UserPermissionService;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,12 @@ public class UserGroupController {
 
     private final UserGroupService service;
     private final EntityModelMapper modelMapper;
+    private final UserPermissionService permissionService;
 
-    public UserGroupController(UserGroupService service, EntityModelMapper modelMapper) {
+    public UserGroupController(UserGroupService service, EntityModelMapper modelMapper, UserPermissionService permissionService) {
         this.service = service;
         this.modelMapper = modelMapper;
+        this.permissionService = permissionService;
     }
 
     @GetMapping
@@ -59,5 +62,11 @@ public class UserGroupController {
         // TODO: add permission validation
         UserGroup ug = this.service.deleteUsers(id, users);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, ug));
+    }
+
+    @GetMapping("/permissions")
+    public ResponseEntity<ApiResponse> getPermissionList() {
+        Set<String> permissionList = this.permissionService.getPermissions();
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, permissionList));
     }
 }
