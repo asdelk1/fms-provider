@@ -2,6 +2,7 @@ package com.owerp.fmsprovider.system.service;
 
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.data.User;
+import com.owerp.fmsprovider.system.model.data.UserGroup;
 import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.repository.UserRepository;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
@@ -76,6 +77,14 @@ public class UserService implements UserDetailsService {
         user.setActive(!user.isActive());
         user = this.repo.save(user);
         return user;
+    }
+
+    public void updatePermissions(User user){
+        Set<UserGroup> userGroups = user.getGroups();
+        Set<String> permissions = new HashSet<>();
+        userGroups.forEach(u -> permissions.addAll(u.getGrantedPermissions()));
+        user.setGrantedPermissions(permissions);
+        this.repo.save(user);
     }
 
     public void deleteUser(long id) {

@@ -29,6 +29,8 @@ public class User implements Serializable {
     @JsonIgnore
     @ManyToMany(mappedBy = "users")
     private Set<UserGroup> groups;
+    @ElementCollection
+    private Set<String> grantedPermissions;
 
     @Override
     public int hashCode() {
