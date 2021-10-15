@@ -9,4 +9,8 @@ public class EntityNotFoundException extends RuntimeException{
     public EntityNotFoundException(String entity, Long id) {
        this.message = "No record found with id " + Long.toString(id) + " in Entity " + entity;
     }
+
+    public EntityNotFoundException(String entity, String key) {
+        this.message = "No record found with key " + key + " in Entity " + entity;
+    }
 }

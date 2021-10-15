@@ -72,6 +72,11 @@ public class UserService implements UserDetailsService {
         throw new EntityNotFoundException("User", id);
     }
 
+    public User getUserByUsername(String username){
+        Optional<User> user = this.repo.findByUsername(username);
+        return user.orElseThrow(() -> new EntityNotFoundException("User", username));
+    }
+
     public User setUserActiveState(UserDTO dto) {
         User user = this.getUser(dto.getId());
         user.setActive(!user.isActive());

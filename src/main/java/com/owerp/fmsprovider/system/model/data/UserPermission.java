@@ -13,4 +13,7 @@ public class UserPermission {
     public static final String USER_GROUP_ADD = "Create User Group";
     public static final String USER_GROUP_EDIT = "Update User Group";
     public static final String USER_GROUP_DELETE = "Delete User Group";
+
+    /* ========================== USER GROUP =============================*/
+    public static final String USER_LOGIN_HISTORY_LIST = "List User Login History";
 }
