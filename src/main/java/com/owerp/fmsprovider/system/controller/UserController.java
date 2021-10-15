@@ -70,4 +70,11 @@ public class UserController {
         Set<UserGroupDTO> userGroups = user.getGroups().stream().map(u -> this.modelMapper.getDTO(u, UserGroupDTO.class)).collect(Collectors.toSet());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, userGroups));
     }
+
+    @GetMapping("/send-email")
+    public ResponseEntity<?> sendEmail(){
+      User user = this.userService.getUser(1);
+      this.userService.sendPasswordResetEmail(user);
+      return ResponseEntity.ok(this.modelMapper.getDTO(user, UserDTO.class));
+    }
 }
