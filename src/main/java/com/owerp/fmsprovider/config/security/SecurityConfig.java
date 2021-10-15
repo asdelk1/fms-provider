@@ -1,5 +1,6 @@
 package com.owerp.fmsprovider.config.security;
 
+import com.owerp.fmsprovider.system.controller.CustomLogoutSuccessHandler;
 import com.owerp.fmsprovider.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +49,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    public CustomLogoutSuccessHandler getLogoutSuccessHandler(){
+        return new CustomLogoutSuccessHandler();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(this.userService)
@@ -62,6 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/token/*").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
+                .and()
+                .logout()
+                .logoutUrl("/user/logout")
+                .logoutSuccessHandler(this.getLogoutSuccessHandler())
                 .and()
                 .exceptionHandling().authenticationEntryPoint(this.owerpAuthenticationEntryPoint)
                 .and()

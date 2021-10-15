@@ -18,6 +18,7 @@ public class UserLoginHistory {
     @GeneratedValue
     private Long id;
     private LocalDateTime loggedInTime;
+    private LocalDateTime loggedOutTime;
     private String ip;
     private String host;
     @OneToOne

@@ -11,6 +11,7 @@ public class UserLoginHistoryDTO {
 
     private Long id;
     private LocalDateTime loggedInTime;
+    private LocalDateTime loggedOutTime;
     private String ip;
     private String host;
     private UserDTO user;
