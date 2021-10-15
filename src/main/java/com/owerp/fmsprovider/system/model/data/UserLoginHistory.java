@@ -27,9 +27,10 @@ public class UserLoginHistory {
     public UserLoginHistory(){
     }
 
-    public UserLoginHistory(User user, String ip){
+    public UserLoginHistory(User user, String ip, String host){
         this.loggedInTime = LocalDateTime.now();
         this.ip = ip;
         this.user = user;
+        this.host = host;
     }
 }

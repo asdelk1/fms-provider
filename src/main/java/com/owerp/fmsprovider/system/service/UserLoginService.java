@@ -25,15 +25,15 @@ public class UserLoginService {
 
     public void addLoginHistory(String username, String ip, String host) {
         User user = this.userService.getUserByUsername(username);
-        UserLoginHistory history = new UserLoginHistory(user, ip);
+        UserLoginHistory history = new UserLoginHistory(user, ip, host);
         history = this.repo.save(history);
-        int hash = this.getKey(username, ip);
+        int hash = this.getKey(ip);
         this.loggedInUsers.put(hash, history);
     }
 
-    public void completeUserSession(String username, String ip) {
+    public void completeUserSession(String ip) {
 
-        int hash = this.getKey(username, ip);
+        int hash = this.getKey(ip);
         UserLoginHistory history = this.loggedInUsers.get(hash);
         if (history == null) {
             return;
@@ -48,8 +48,7 @@ public class UserLoginService {
         return this.repo.findAll();
     }
 
-    private int getKey(String username, String ip) {
-//        return Objects.hash(username, ip);
+    private int getKey(String ip) {
         return Objects.hash(ip);
     }
 }
