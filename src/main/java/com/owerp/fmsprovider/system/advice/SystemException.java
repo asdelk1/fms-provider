@@ -24,4 +24,10 @@ public class SystemException extends ResponseEntityExceptionHandler {
         ApiResponse apiResponse = new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
         return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler({UnAuthorizedActionException.class})
+    public ResponseEntity<ApiResponse> handleUnauthorizedException(UnAuthorizedActionException ex){
+        ApiResponse res = new ApiResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return new ResponseEntity<>(res, HttpStatus.UNAUTHORIZED);
+    }
 }

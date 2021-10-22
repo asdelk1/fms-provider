@@ -1,4 +1,4 @@
-package com.owerp.fmsprovider.config.security;
+package com.owerp.fmsprovider.config;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;

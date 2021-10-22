@@ -70,4 +70,11 @@ public class UserController {
         Set<UserGroupDTO> userGroups = user.getGroups().stream().map(u -> this.modelMapper.getDTO(u, UserGroupDTO.class)).collect(Collectors.toSet());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, userGroups));
     }
+
+    @GetMapping("/{username}/permissions")
+    public ResponseEntity<ApiResponse> getUserPermissions(@PathVariable String username){
+        User user = this.userService.getUserByUsername(username);
+        ApiResponse res = new ApiResponse(HttpStatus.OK, user.getGrantedPermissions());
+        return ResponseEntity.ok(res);
+    }
 }
