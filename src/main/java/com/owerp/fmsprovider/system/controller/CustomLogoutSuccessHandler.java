@@ -1,6 +1,6 @@
 package com.owerp.fmsprovider.system.controller;
 
-import com.owerp.fmsprovider.system.service.UserLoginService;
+import com.owerp.fmsprovider.system.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class CustomLogoutSuccessHandler extends HttpStatusReturningLogoutSuccessHandler implements LogoutSuccessHandler  {
 
     @Autowired
-    private UserLoginService service;
+    private AdminService service;
 
     public CustomLogoutSuccessHandler() {
         super(HttpStatus.OK);

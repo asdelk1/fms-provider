@@ -32,6 +32,7 @@ public class User implements Serializable {
     @ElementCollection
     private Set<String> grantedPermissions;
 
+
     @Override
     public int hashCode() {
         return Objects.hash(this.id, this.username);

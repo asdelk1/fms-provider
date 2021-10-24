@@ -1,16 +1,11 @@
 package com.owerp.fmsprovider.system.controller;
 
-import com.owerp.fmsprovider.config.security.TokenProvider;
+import com.owerp.fmsprovider.system.model.data.PasswordResetToken;
 import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import com.owerp.fmsprovider.system.model.dto.UserCredential;
-import com.owerp.fmsprovider.system.service.UserLoginService;
+import com.owerp.fmsprovider.system.service.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,31 +17,26 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/token")
 public class AdminController {
 
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManager authenticationManager;
-    private final UserLoginService loginService;
+    private final AdminService adminService;
 
-    public AdminController(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserLoginService loginService) {
-        this.authenticationManager = authenticationManager;
-        this.tokenProvider = tokenProvider;
-        this.loginService = loginService;
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     @PostMapping("/generate-token")
-    public ResponseEntity<ApiResponse> generateToken(@RequestBody UserCredential credential, HttpServletRequest request){
+    public ResponseEntity<ApiResponse> generateToken(@RequestBody UserCredential credential, HttpServletRequest request) {
 
-        Authentication authToken = new UsernamePasswordAuthenticationToken(credential.getEmail(), credential.getPassword());
-        Authentication authentication = this.authenticationManager.authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        final String token = this.tokenProvider.generateToken(authentication);
+        final String token = this.adminService.generateToken(credential, request.getRemoteAddr(), request.getRemoteHost());
         ApiResponse apiResponse = new ApiResponse(HttpStatus.OK, "", token);
-
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-
-        this.loginService.addLoginHistory(user.getUsername(), request.getRemoteAddr(), request.getRemoteHost());
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PostMapping("/generate-password-reset-token")
+    public ResponseEntity<ApiResponse> generatePasswordResetToken(@RequestBody String username){
+        final PasswordResetToken tokenObj = this.adminService.generatePasswordResetToken(username);
+        ApiResponse res = new ApiResponse(HttpStatus.OK, tokenObj.getToken());
+        return ResponseEntity.ok(res);
+    }
 
 
 }
