@@ -77,4 +77,11 @@ public class UserController {
         ApiResponse res = new ApiResponse(HttpStatus.OK, user.getGrantedPermissions());
         return ResponseEntity.ok(res);
     }
+
+    @GetMapping("/send-email")
+    public ResponseEntity<?> sendEmail(){
+      User user = this.userService.getUser(1);
+      this.userService.sendPasswordResetEmail(user);
+      return ResponseEntity.ok(this.modelMapper.getDTO(user, UserDTO.class));
+    }
 }
