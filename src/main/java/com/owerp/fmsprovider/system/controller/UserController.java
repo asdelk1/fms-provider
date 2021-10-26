@@ -83,4 +83,11 @@ public class UserController {
         ApiResponse res = new ApiResponse(HttpStatus.OK, user.getGrantedPermissions());
         return ResponseEntity.ok(res);
     }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<ApiResponse> getUserByUsername(@PathVariable String username){
+        User user = this.userService.getUserByUsername(username);
+        ApiResponse response = new ApiResponse(HttpStatus.OK, this.modelMapper.getDTO(user, UserDTO.class));
+        return ResponseEntity.ok(response);
+    }
 }
