@@ -126,4 +126,9 @@ public class UserService implements UserDetailsService {
     public void sendPasswordResetEmail(User user) {
         this.emailService.sendEmail("");
     }
+
+    public void updatePassword(User user, String password){
+        user.setPassword(this.encoder.encode(password));
+        this.repo.save(user);
+    }
 }
