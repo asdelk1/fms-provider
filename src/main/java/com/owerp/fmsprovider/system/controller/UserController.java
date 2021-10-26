@@ -5,12 +5,15 @@ import com.owerp.fmsprovider.system.model.data.UserGroup;
 import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.model.dto.UserGroupDTO;
+import com.owerp.fmsprovider.system.service.AdminService;
 import com.owerp.fmsprovider.system.service.UserService;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,11 +23,13 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final AdminService adminService;
     private final EntityModelMapper modelMapper;
 
-    public UserController(UserService userService, EntityModelMapper modelMapper) {
+    public UserController(UserService userService, EntityModelMapper modelMapper, AdminService adminService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.adminService = adminService;
     }
 
     @GetMapping()
@@ -34,8 +39,9 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse> save(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<ApiResponse> save(@RequestBody UserDTO userDTO, HttpServletRequest request) {
         UserDTO newUser = this.userService.saveUser(userDTO);
+        this.adminService.generatePasswordResetToken(request, newUser.getEmail());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED, newUser));
     }
 
@@ -76,12 +82,5 @@ public class UserController {
         User user = this.userService.getUserByUsername(username);
         ApiResponse res = new ApiResponse(HttpStatus.OK, user.getGrantedPermissions());
         return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/send-email")
-    public ResponseEntity<?> sendEmail(){
-      User user = this.userService.getUser(1);
-      this.userService.sendPasswordResetEmail(user);
-      return ResponseEntity.ok(this.modelMapper.getDTO(user, UserDTO.class));
     }
 }

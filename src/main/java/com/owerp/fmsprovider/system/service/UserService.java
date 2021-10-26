@@ -59,9 +59,6 @@ public class UserService implements UserDetailsService {
             user.setPassword(existingUser.getPassword()); // no need to update the password for basic information changes. dto will always have empty password
         }
         user = this.repo.save(user);
-        if(isNewUser){
-            this.sendPasswordResetEmail(user);
-        }
         return this.modelMapper.getDTO(user, UserDTO.class);
     }
 
@@ -118,13 +115,6 @@ public class UserService implements UserDetailsService {
             defaultAdminUser.setActive(true);
             this.repo.save(defaultAdminUser);
         }
-    }
-
-    /**
-     * This method will email to given user with a token to reset password
-     */
-    public void sendPasswordResetEmail(User user) {
-        this.emailService.sendEmail("");
     }
 
     public void updatePassword(User user, String password){
