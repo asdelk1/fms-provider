@@ -26,11 +26,13 @@ public class UserService implements UserDetailsService {
     private final UserRepository repo;
     private final BCryptPasswordEncoder encoder;
     private final EntityModelMapper modelMapper;
+    private final EmailService emailService;
 
-    public UserService(UserRepository repo, BCryptPasswordEncoder encoder, EntityModelMapper modelMapper) {
+    public UserService(UserRepository repo, BCryptPasswordEncoder encoder, EntityModelMapper modelMapper, EmailService emailService) {
         this.repo = repo;
         this.encoder = encoder;
         this.modelMapper = modelMapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -51,7 +53,8 @@ public class UserService implements UserDetailsService {
 
     public UserDTO saveUser(UserDTO dto) {
         User user = this.modelMapper.getEntity(dto, User.class);
-        if (dto.getId() != null) {
+        boolean isNewUser = dto.getId() == null;
+        if (!isNewUser) {
             User existingUser = this.repo.getById(dto.getId());
             user.setPassword(existingUser.getPassword()); // no need to update the password for basic information changes. dto will always have empty password
         }
@@ -84,7 +87,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public void updatePermissions(User user){
+    public void updatePermissions(User user) {
         Set<UserGroup> userGroups = user.getGroups();
         Set<String> permissions = new HashSet<>();
         userGroups.forEach(u -> permissions.addAll(u.getGrantedPermissions()));
@@ -112,5 +115,10 @@ public class UserService implements UserDetailsService {
             defaultAdminUser.setActive(true);
             this.repo.save(defaultAdminUser);
         }
+    }
+
+    public void updatePassword(User user, String password){
+        user.setPassword(this.encoder.encode(password));
+        this.repo.save(user);
     }
 }
