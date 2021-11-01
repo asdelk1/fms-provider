@@ -31,8 +31,11 @@ public class EntityModelMapper {
                 if (entityField.isPresent()) {
 
                     // fetch getter and setter
-                    String getterName = field.getType().equals(Boolean.class) || field.getType().equals(boolean.class) ? "is" + StringUtils.capitalize(field.getName()) :
-                            "get" + StringUtils.capitalize(field.getName());
+//                    String getterName = field.getType().equals(Boolean.class) || field.getType().equals(boolean.class) ? "is" + StringUtils.capitalize(field.getName()) :
+//                            "get" + StringUtils.capitalize(field.getName());
+
+                    // if getters are generated using lombok then it's name is prefixed by 'get' not 'is'
+                    String getterName = "get" + StringUtils.capitalize(field.getName());
                     String setterName = "set" + StringUtils.capitalize(field.getName());
                     Method getter = dto.getClass().getDeclaredMethod(getterName);
                     Method setter = entityClz.getDeclaredMethod(setterName, field.getType());
