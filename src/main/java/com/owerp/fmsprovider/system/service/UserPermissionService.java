@@ -5,6 +5,7 @@ import com.owerp.fmsprovider.system.advice.UnAuthorizedActionException;
 import com.owerp.fmsprovider.system.model.data.User;
 import com.owerp.fmsprovider.system.model.data.UserPermission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 @Service
 public class UserPermissionService {
-    private Set<String> permissions = new HashSet<>();
+    private final Set<String> permissions = new HashSet<>();
 
     private final UserService userService;
 
@@ -30,6 +31,11 @@ public class UserPermissionService {
         this.permissions.add(UserPermission.USER_GROUP_ADD);
         this.permissions.add(UserPermission.USER_GROUP_EDIT);
         this.permissions.add(UserPermission.USER_GROUP_DELETE);
+
+        this.permissions.add(UserPermission.SUPPLIER_TYPE_LIST);
+        this.permissions.add(UserPermission.SUPPLIER_TYPE_ADD);
+        this.permissions.add(UserPermission.SUPPLIER_TYPE_EDIT);
+        this.permissions.add(UserPermission.SUPPLIER_TYPE_DELETE);
 
 
         this.userService = userService;

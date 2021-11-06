@@ -16,4 +16,12 @@ public class UserPermission {
 
     /* ========================== USER GROUP =============================*/
     public static final String USER_LOGIN_HISTORY_LIST = "List User Login History";
+
+    /* ======================== CUSTOMER TYPE =============================*/
+
+    /* ========================= SUPPLIER TYPES =============================*/
+    public static final String SUPPLIER_TYPE_LIST = "List Supplier Type";
+    public static final String SUPPLIER_TYPE_ADD = "Create Supplier Type";
+    public static final String SUPPLIER_TYPE_EDIT = "Update Supplier Type";
+    public static final String SUPPLIER_TYPE_DELETE = "Delete Supplier Type";
 }
