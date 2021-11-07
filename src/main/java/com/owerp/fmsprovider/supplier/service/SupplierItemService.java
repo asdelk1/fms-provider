@@ -1,8 +1,7 @@
 package com.owerp.fmsprovider.supplier.service;
 
-import com.owerp.fmsprovider.supplier.data.dto.SupplierItemDTO;
-import com.owerp.fmsprovider.supplier.data.dto.SupplierTypeDTO;
-import com.owerp.fmsprovider.supplier.data.model.SupplierItem;
+import com.owerp.fmsprovider.supplier.model.dto.SupplierItemDTO;
+import com.owerp.fmsprovider.supplier.model.data.SupplierItem;
 import com.owerp.fmsprovider.supplier.repository.SupplierItemRepository;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.springframework.stereotype.Service;

@@ -1,22 +1,20 @@
 package com.owerp.fmsprovider.supplier.controller;
 
-import com.owerp.fmsprovider.supplier.data.dto.SupplierItemDTO;
-import com.owerp.fmsprovider.supplier.data.model.SupplierItem;
+import com.owerp.fmsprovider.supplier.model.dto.SupplierItemDTO;
+import com.owerp.fmsprovider.supplier.model.data.SupplierItem;
 import com.owerp.fmsprovider.supplier.service.SupplierItemService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/supplier/items")
+@RequestMapping("/suppliers/items")
 public class SupplierItemController {
 
     private final SupplierItemService service;

@@ -1,7 +1,7 @@
 package com.owerp.fmsprovider.supplier.controller;
 
-import com.owerp.fmsprovider.supplier.data.dto.SupplierTypeDTO;
-import com.owerp.fmsprovider.supplier.data.model.SupplierType;
+import com.owerp.fmsprovider.supplier.model.dto.SupplierTypeDTO;
+import com.owerp.fmsprovider.supplier.model.data.SupplierType;
 import com.owerp.fmsprovider.supplier.service.SupplierTypeService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.data.UserPermission;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/supplier/types")
+@RequestMapping("/suppliers/types")
 public class SupplierTypeController {
 
     private final SupplierTypeService service;
