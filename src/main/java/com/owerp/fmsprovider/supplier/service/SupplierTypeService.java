@@ -32,4 +32,8 @@ public class SupplierTypeService {
         SupplierType type = this.modelMapper.getEntity(dto, SupplierType.class);
         return this.repository.save(type);
     }
+
+    public List<SupplierType> getAllActive(){
+        return this.repository.findAllByStatusIsTrue();
+    }
 }

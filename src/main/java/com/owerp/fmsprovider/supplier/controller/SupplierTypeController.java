@@ -1,7 +1,7 @@
 package com.owerp.fmsprovider.supplier.controller;
 
-import com.owerp.fmsprovider.supplier.model.dto.SupplierTypeDTO;
 import com.owerp.fmsprovider.supplier.model.data.SupplierType;
+import com.owerp.fmsprovider.supplier.model.dto.SupplierTypeDTO;
 import com.owerp.fmsprovider.supplier.service.SupplierTypeService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.data.UserPermission;
@@ -59,5 +59,11 @@ public class SupplierTypeController {
         dto.setId(id);
         SupplierType type = this.service.save(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.CREATED, type));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse> getActiveTypes(){
+        List<SupplierTypeDTO> list = this.service.getAllActive().stream().map(s -> this.modelMapper.getDTO(s, SupplierTypeDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
     }
 }
