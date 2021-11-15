@@ -37,7 +37,7 @@ public class SupplierController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(supplier, SupplierDTO.class)));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApiResponse> create(@RequestBody SupplierDTO dto){
         Supplier supplier = this.service.save(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(supplier, SupplierDTO.class)));

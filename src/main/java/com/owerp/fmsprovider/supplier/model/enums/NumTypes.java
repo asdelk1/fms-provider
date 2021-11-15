@@ -1,0 +1,20 @@
+package com.owerp.fmsprovider.supplier.model.enums;
+
+public enum NumTypes {
+    CUSTOMER,
+    SUPPLIER,
+    SALES_INVOICE,
+    JOURNAL_ENTRY,
+    CREDIT_NOTE,
+    ADVANCED_RECEIVED,
+    CUSTOMER_PAYMENT,
+    PAY_ROLL,
+    PURCHASE_INVOICE,
+    ADVANCED_PAYMENT,
+    DEBIT_NOTE,
+    SUPPLIER_PAYMENT,
+    CUSTOMER_CESS,
+    BANK_PAYMENT,
+    BANK_DEPOSIT,
+    FUND_TRANSFER
+}
