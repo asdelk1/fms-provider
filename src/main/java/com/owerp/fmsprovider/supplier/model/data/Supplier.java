@@ -29,8 +29,8 @@ public class Supplier {
     private String mobileNo;
     private String fax;
     private String email;
-    private String website;
-    private String vatRegNo;
+    private String webSite;
+    private String vatNo;
     private String sVatNo;
     private String businessRegNo;
     private String accountNo;
@@ -41,4 +41,5 @@ public class Supplier {
     private Double creditLimit;
     @OneToOne
     private LedgerAccount controlAccount;
+    private Boolean status;
 }

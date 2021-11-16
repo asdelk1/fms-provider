@@ -40,7 +40,9 @@ public class SupplierService {
         if (supplier.getId() == null) { // get Customer code for new customer
             supplier.setCode(getSupplierNumber(null, dto.getType().getId(), false));
         } else {
-            supplier.setCode(dto.getCode()); // Get the Customer code from when saving
+            Supplier extSupplier = this.repo.getById(supplier.getId());
+            String code = extSupplier.getCode();
+            supplier.setCode(code); // Get the Customer code from when saving
         }
         return this.repo.save(supplier);
     }
