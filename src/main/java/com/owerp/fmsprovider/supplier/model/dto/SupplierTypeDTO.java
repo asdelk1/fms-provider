@@ -1,4 +1,4 @@
-package com.owerp.fmsprovider.supplier.data.dto;
+package com.owerp.fmsprovider.supplier.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
