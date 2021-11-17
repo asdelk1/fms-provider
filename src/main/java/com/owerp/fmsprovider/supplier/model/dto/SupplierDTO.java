@@ -1,8 +1,8 @@
 package com.owerp.fmsprovider.supplier.model.dto;
 
+import com.owerp.fmsprovider.helper.model.dto.PaymentMethodDTO;
+import com.owerp.fmsprovider.helper.model.dto.PaymentTermsDTO;
 import com.owerp.fmsprovider.ledger.model.dto.LedgerAccountDTO;
-import com.owerp.fmsprovider.payment.model.dto.PaymentMethodDTO;
-import com.owerp.fmsprovider.payment.model.dto.PaymentTermsDTO;
 import lombok.Getter;
 import lombok.Setter;
 
