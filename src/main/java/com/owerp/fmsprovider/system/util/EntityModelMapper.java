@@ -53,7 +53,7 @@ public class EntityModelMapper {
 
                     // setting values in new object
                     Object value = getter.invoke(dto);
-                    if(isRelatedField(entityField.get()) && value != null){
+                    if(isRelatedField(entityField.get(), value)){
                         value = this.getRelatedEntity(field.getType(), entityField.get().getType(), value);
                     }
                     setter.invoke(entity, value);
@@ -71,9 +71,21 @@ public class EntityModelMapper {
         return modelMapper.map(entity, dtoClz);
     }
 
-    private boolean isRelatedField(Field field){
-        return field.getAnnotation(OneToOne.class) != null || field.getAnnotation(ManyToOne.class) != null || field.getAnnotation(OneToMany.class) != null;
+    private boolean isRelatedField(Field field, Object value){
+        boolean isRelated = field.getAnnotation(OneToOne.class) != null || field.getAnnotation(ManyToOne.class) != null || field.getAnnotation(OneToMany.class) != null;
+        if(!isRelated || value == null){
+            return false;
+        }
+
+        try {
+            Object id = field.getType().getDeclaredMethod("getId").invoke(value);
+            return id != null;
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+           return false;
+        }
     }
+
+
 
     private Object getRelatedEntity(Class<?> dtoClass, Class<?> entityClass, Object object) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         Method idGetter = dtoClass.getDeclaredMethod("getId");
