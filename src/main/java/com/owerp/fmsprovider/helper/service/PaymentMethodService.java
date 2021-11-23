@@ -4,7 +4,6 @@ import com.owerp.fmsprovider.helper.model.data.PaymentMethod;
 import com.owerp.fmsprovider.helper.model.dto.PaymentMethodDTO;
 import com.owerp.fmsprovider.helper.repository.PaymentMethodRepository;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -26,7 +26,7 @@ public class EntityModelMapper {
         this.applicationContext = applicationContext;
     }
 
-    public <T> T getEntity(Object dto, Class<T> entityClz){
+    public <T> T  getEntity(Object dto, Class<T> entityClz){
         T entity;
         try {
             entity = entityClz.getConstructor().newInstance();
@@ -53,7 +53,7 @@ public class EntityModelMapper {
 
                     // setting values in new object
                     Object value = getter.invoke(dto);
-                    if(isRelatedField(entityField.get(), value)){
+                    if(isRelatedField(entityField.get(), field, value)){
                         value = this.getRelatedEntity(field.getType(), entityField.get().getType(), value);
                     }
                     setter.invoke(entity, value);
@@ -71,14 +71,16 @@ public class EntityModelMapper {
         return modelMapper.map(entity, dtoClz);
     }
 
-    private boolean isRelatedField(Field field, Object value){
-        boolean isRelated = field.getAnnotation(OneToOne.class) != null || field.getAnnotation(ManyToOne.class) != null || field.getAnnotation(OneToMany.class) != null;
+    private boolean isRelatedField(Field entityField, Field dtoField, Object value){
+        boolean isRelated = entityField.getAnnotation(OneToOne.class) != null || entityField.getAnnotation(ManyToOne.class) != null || entityField.getAnnotation(OneToMany.class) != null;
         if(!isRelated || value == null){
             return false;
         }
 
         try {
-            Object id = field.getType().getDeclaredMethod("getId").invoke(value);
+            Class<?> dtoClass = dtoField.getType();
+            Method method = dtoClass.getDeclaredMethod("getId");
+            Object id = method.invoke(value);
             return id != null;
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
            return false;
