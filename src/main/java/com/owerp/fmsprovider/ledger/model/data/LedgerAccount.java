@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "fin_ledger_account")
+@Table(name = "fin_ledger_account", uniqueConstraints = {@UniqueConstraint(columnNames = {"ledgerAccCode"})})
 @Getter
 @Setter
 public class LedgerAccount {

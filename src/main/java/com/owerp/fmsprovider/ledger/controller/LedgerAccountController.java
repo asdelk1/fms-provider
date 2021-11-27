@@ -1,7 +1,9 @@
 package com.owerp.fmsprovider.ledger.controller;
 
 import com.owerp.fmsprovider.ledger.model.data.LedgerAccount;
+import com.owerp.fmsprovider.ledger.model.data.LedgerCategory;
 import com.owerp.fmsprovider.ledger.model.dto.LedgerAccountDTO;
+import com.owerp.fmsprovider.ledger.model.dto.LedgerCategoryDTO;
 import com.owerp.fmsprovider.ledger.service.LedgerAccountService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.dto.ApiResponse;
@@ -56,6 +58,24 @@ public class LedgerAccountController {
         dto.setId(resource.getId());
         ApiResponse response = new ApiResponse(HttpStatus.OK, this.map(this.service.save(dto)));
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create-legend-category")
+    public ResponseEntity<ApiResponse> createLedgerCategory(@RequestBody LedgerCategoryDTO dto){
+        LedgerCategory category = this.service.saveLedgerCategory(dto);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(category, LedgerCategoryDTO.class)));
+    }
+
+    @GetMapping("/categories/{id}")
+    public ResponseEntity<ApiResponse> getLedgerCategory(@PathVariable long id){
+        LedgerCategory category = this.service.getLedgerCategory(id).orElseThrow(()-> new EntityNotFoundException("Ledger Category", id));
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, category));
+    }
+
+    @GetMapping("/categories/active")
+    public ResponseEntity<ApiResponse> getLedgerCategory(){
+        List<LedgerCategoryDTO> list = this.service.getAllActiveCategories().stream().map((c)-> this.mapper.getDTO(c, LedgerCategoryDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
     }
 
     private LedgerAccountDTO map(LedgerAccount account){

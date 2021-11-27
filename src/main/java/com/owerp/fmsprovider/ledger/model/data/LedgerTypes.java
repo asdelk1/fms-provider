@@ -15,8 +15,16 @@ public class LedgerTypes {
     private Long id;
     private String typeName;
     private Integer typeCategory; /* 1 - Income Statements, 2 - Balance Sheet*/
-    private Integer clarification;
+    private Boolean clarification;
     private Integer status;
     private String clarifi; /* D - Debit, C - Credit */
 
+    public LedgerTypes() {}
+
+    public LedgerTypes(Boolean clarification,Integer status, Integer typeCategory, String typeName) {
+        this.typeName = typeName;
+        this.typeCategory = typeCategory;
+        this.clarification = clarification;
+        this.status = status;
+    }
 }
