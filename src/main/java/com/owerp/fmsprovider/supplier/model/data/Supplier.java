@@ -1,8 +1,8 @@
 package com.owerp.fmsprovider.supplier.model.data;
 
+import com.owerp.fmsprovider.helper.model.data.PaymentMethod;
+import com.owerp.fmsprovider.helper.model.data.PaymentTerms;
 import com.owerp.fmsprovider.ledger.model.data.LedgerAccount;
-import com.owerp.fmsprovider.payment.model.data.PaymentMethod;
-import com.owerp.fmsprovider.payment.model.data.PaymentTerms;
 import lombok.Getter;
 import lombok.Setter;
 

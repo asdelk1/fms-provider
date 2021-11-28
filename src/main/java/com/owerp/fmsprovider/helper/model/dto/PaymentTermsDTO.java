@@ -1,4 +1,4 @@
-package com.owerp.fmsprovider.payment.model.dto;
+package com.owerp.fmsprovider.helper.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PaymentTermsDTO {
+
     private Long id;
     private Integer term;
     private String description;

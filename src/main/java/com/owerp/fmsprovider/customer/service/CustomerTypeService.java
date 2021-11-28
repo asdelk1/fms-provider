@@ -26,6 +26,10 @@ public class CustomerTypeService {
         return this.repo.findAll();
     }
 
+    public List<CustomerType> getAllActive(){
+        return this.repo.findAllByStatusIsTrue();
+    }
+
     public CustomerType get(long id){
         Optional<CustomerType> type = this.repo.findById(id);
         return type.orElseThrow(() -> new EntityNotFoundException("Customer Type", id));

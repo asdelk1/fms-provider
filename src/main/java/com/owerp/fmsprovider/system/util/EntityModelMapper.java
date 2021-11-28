@@ -26,7 +26,7 @@ public class EntityModelMapper {
         this.applicationContext = applicationContext;
     }
 
-    public <T> T getEntity(Object dto, Class<T> entityClz){
+    public <T> T getEntity(Object dto, Class<T> entityClz) {
         T entity;
         try {
             entity = entityClz.getConstructor().newInstance();
@@ -53,7 +53,7 @@ public class EntityModelMapper {
 
                     // setting values in new object
                     Object value = getter.invoke(dto);
-                    if(isRelatedField(entityField.get()) && value != null){
+                    if (isRelatedField(entityField.get(), field, value)) {
                         value = this.getRelatedEntity(field.getType(), entityField.get().getType(), value);
                     }
                     setter.invoke(entity, value);
@@ -66,20 +66,38 @@ public class EntityModelMapper {
         return entity;
     }
 
-    public <T> T getDTO(Object entity, Class<T> dtoClz){
+    public <T> T getDTO(Object entity, Class<T> dtoClz) {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(entity, dtoClz);
     }
 
-    private boolean isRelatedField(Field field){
-        return field.getAnnotation(OneToOne.class) != null || field.getAnnotation(ManyToOne.class) != null || field.getAnnotation(OneToMany.class) != null;
+    private boolean isRelatedField(Field entityField, Field dtoField, Object value) {
+        boolean isRelated = entityField.getAnnotation(OneToOne.class) != null || entityField.getAnnotation(ManyToOne.class) != null || entityField.getAnnotation(OneToMany.class) != null;
+        if (!isRelated || value == null) {
+            return false;
+        }
+
+        try {
+            Class<?> dtoClass = dtoField.getType();
+            Method method = dtoClass.getDeclaredMethod("getId");
+            Object id = method.invoke(value);
+            if (id == null || ((long)id == 0)) {
+                value = null;
+                return false;
+            } else {
+                return true;
+            }
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            return false;
+        }
     }
+
 
     private Object getRelatedEntity(Class<?> dtoClass, Class<?> entityClass, Object object) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         Method idGetter = dtoClass.getDeclaredMethod("getId");
         final Long id = (Long) idGetter.invoke(object);
         String repoName = entityClass.getSimpleName() + "Repository";
-        JpaRepository<Object,Long> repository = (JpaRepository<Object,Long>) this.applicationContext.getBean(StringUtils.uncapitalize(repoName));
+        JpaRepository<Object, Long> repository = (JpaRepository<Object, Long>) this.applicationContext.getBean(StringUtils.uncapitalize(repoName));
         return repository.getById(id);
     }
 

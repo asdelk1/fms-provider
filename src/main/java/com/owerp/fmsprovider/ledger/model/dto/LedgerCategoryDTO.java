@@ -11,6 +11,6 @@ public class LedgerCategoryDTO {
     private String accCode;
     private String accName;
     private Integer comId;
-    private Integer status;
+    private boolean status;
     private LedgerTypesDTO ledgerType;
 }
