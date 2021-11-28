@@ -32,6 +32,13 @@ public class CustomerTypeController {
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse> listAllActive() {
+        List<CustomerType> customerTypeList = this.service.getAllActive();
+        ApiResponse res = new ApiResponse(HttpStatus.OK, customerTypeList.stream().map(customerType -> this.modelMapper.getDTO(customerType, CustomerTypeDTO.class)).collect(Collectors.toList()));
+        return ResponseEntity.ok(res);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> findById(@PathVariable long id){
         CustomerType type = this.service.get(id);
