@@ -32,6 +32,10 @@ public class CustomerItemService {
         return this.repo.findAllByStatusIsTrue();
     }
 
+    public List<CustomerItem> getAllByCustomerType(long customerTypeId){
+        return this.repo.getActiveCustomerItemsByCustomerType(customerTypeId);
+    }
+
     public Optional<CustomerItem> get(long id){
         return this.repo.findById(id);
     }
