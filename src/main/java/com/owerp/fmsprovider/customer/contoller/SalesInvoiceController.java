@@ -5,6 +5,7 @@ import com.owerp.fmsprovider.customer.data.dto.SalesInvoiceDetailDTO;
 import com.owerp.fmsprovider.customer.data.dto.SalesInvoiceItemDTO;
 import com.owerp.fmsprovider.customer.data.model.SalesInvoice;
 import com.owerp.fmsprovider.customer.service.SalesInvoiceService;
+import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,12 @@ public class SalesInvoiceController {
                 .map((s) -> this.mapper.getDTO(s, SalesInvoiceDTO.class))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> get(@PathVariable long id){
+        SalesInvoice invoice = this.service.get(id).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", id));
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(invoice, SalesInvoiceDTO.class)));
     }
 
     @PostMapping()

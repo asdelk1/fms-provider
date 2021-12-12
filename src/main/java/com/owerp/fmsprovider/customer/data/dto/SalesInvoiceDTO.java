@@ -43,19 +43,13 @@ public class SalesInvoiceDTO {
 
 
     private UserDTO enteredBy;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime enteredOn;
 
     private UserDTO checkedBy;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime checkedOn;
     private String checkerNote;
 
     private UserDTO authorizedBy;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime authorizedOn;
     private String approverNote;
 

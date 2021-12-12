@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +59,10 @@ public class SalesInvoiceService {
 
     public List<SalesInvoice> getAll() {
         return this.repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    public Optional<SalesInvoice> get(long id){
+        return this.repo.findById(id);
     }
 
     public SalesInvoice save(SalesInvoiceDTO dto) {
