@@ -42,5 +42,9 @@ public class AccountingPeriodService {
 
         return this.repo.save(period);
     }
+
+    public AccountingPeriod getLatestPeriod(){
+        return this.repo.findFirstByStatusEqualsOrderByIdDesc(true);
+    }
     
 }

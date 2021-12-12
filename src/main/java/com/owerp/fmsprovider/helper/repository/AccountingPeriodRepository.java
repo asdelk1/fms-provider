@@ -8,4 +8,5 @@ import java.util.List;
 public interface AccountingPeriodRepository extends JpaRepository<AccountingPeriod, Long> {
 
     List<AccountingPeriod> findAllByStatusIsTrue();
+    AccountingPeriod findFirstByStatusEqualsOrderByIdDesc(Boolean status);
 }

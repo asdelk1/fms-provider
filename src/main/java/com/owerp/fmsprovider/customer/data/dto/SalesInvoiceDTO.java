@@ -25,8 +25,6 @@ public class SalesInvoiceDTO {
     private InvoiceType invoiceType;
     private String invoiceAddress;
     private String memo;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate invoiceDate;
     //    @NotNull(message = "Select cost center")
     private CostCenterDTO costCenter;

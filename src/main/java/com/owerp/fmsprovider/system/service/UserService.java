@@ -7,6 +7,7 @@ import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.repository.UserRepository;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -98,6 +99,11 @@ public class UserService implements UserDetailsService {
     public void deleteUser(long id) {
         User user = this.getUser(id);
         this.repo.delete(user);
+    }
+
+    public User getLoggedInUser(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.getUserByUsername(userDetails.getUsername());
     }
 
     @PostConstruct
