@@ -19,6 +19,7 @@ import com.owerp.fmsprovider.supplier.model.enums.NumTypes;
 import com.owerp.fmsprovider.supplier.service.FinNumbersService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.data.User;
+import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.service.UserService;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,12 @@ public class SalesInvoiceService {
 
     public List<SalesInvoice> getAll() {
         return this.repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    public List<SalesInvoice> getAllToCheck(){
+        List<SalesInvoice> list = new ArrayList<>(this.repo.getSalesInvoicesByDocApproveType(DocApproveType.NONE));
+        list.addAll(this.repo.getSalesInvoicesByDocApproveType(DocApproveType.APPROVE_REJECTED));
+        return list;
     }
 
     public Optional<SalesInvoice> get(long id){
@@ -256,6 +263,37 @@ public class SalesInvoiceService {
 
         return result;
     }
+
+    public SalesInvoice checkInvoice(DocumentApproveDTO dto){
+        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+
+        invoice.setDocApproveType(DocApproveType.CHECKED);
+        invoice.setCheckerNote(dto.getNote());
+        invoice.setCheckedOn(LocalDateTime.now());
+        invoice.setCheckedBy(this.userService.getLoggedInUser());
+
+        invoice = this.repo.save(invoice);
+
+        //TODO: send sales invoice approval reminder (sendInternalNotificationForCustomerActions)
+        return invoice;
+    }
+
+    // TODO: rewrite this one to support new mail service
+//    public void sendInternalNotificationForCustomerActions(String menuItem, UserNotificationTypes userNotificationTypes, String subject, String message,
+//                                                           boolean isSentEmail, Long commonId, String actionUrl){
+//        //Get the User list who have the permission for selected action (Menu item)
+//        List<UserDTO> userList = menuService.getUsersHasPermission(menuItem);
+//
+//        if(userList.size() > 0) {
+//            UserNotificationDTO userNotificationDTO = new UserNotificationDTO();
+//            userNotificationDTO.setNotificationType(userNotificationTypes);
+//            userNotificationDTO.setSubject(subject);
+//            userNotificationDTO.setMessage(message);
+//            userNotificationDTO.setSentEmail(isSentEmail);
+//            userNotificationDTO.setCommonId(commonId);
+//            notificationService.addBulkUserNotification(userList, userNotificationDTO, actionUrl);
+//        }
+//    }
 
     private List<InvoiceTaxDetailsDTO> calculateTaxSeparate(TaxGroupDTO taxGroupDTO, Double amount, List<InvoiceTaxDetailsDTO> taxDetailsList, boolean isAdd) {
 

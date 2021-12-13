@@ -1,6 +1,5 @@
 package com.owerp.fmsprovider.customer.data.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.owerp.fmsprovider.customer.data.enums.DocApproveType;
 import com.owerp.fmsprovider.customer.data.enums.InvoiceType;
 import com.owerp.fmsprovider.helper.model.dto.CostCenterDTO;
@@ -8,7 +7,6 @@ import com.owerp.fmsprovider.helper.model.dto.PaymentTermsDTO;
 import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +24,6 @@ public class SalesInvoiceDTO {
     private String invoiceAddress;
     private String memo;
     private LocalDate invoiceDate;
-    //    @NotNull(message = "Select cost center")
     private CostCenterDTO costCenter;
     private String poNumber;
     private PaymentTermsDTO paymentTerms;

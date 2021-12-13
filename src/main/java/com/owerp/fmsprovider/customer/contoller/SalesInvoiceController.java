@@ -1,5 +1,6 @@
 package com.owerp.fmsprovider.customer.contoller;
 
+import com.owerp.fmsprovider.customer.data.dto.DocumentApproveDTO;
 import com.owerp.fmsprovider.customer.data.dto.SalesInvoiceDTO;
 import com.owerp.fmsprovider.customer.data.dto.SalesInvoiceDetailDTO;
 import com.owerp.fmsprovider.customer.data.dto.SalesInvoiceItemDTO;
@@ -31,21 +32,19 @@ public class SalesInvoiceController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAll() {
-        List<SalesInvoiceDTO> list = this.service.getAll().stream()
-                .map((s) -> this.mapper.getDTO(s, SalesInvoiceDTO.class))
-                .collect(Collectors.toList());
+        List<SalesInvoiceDTO> list = this.map(this.service.getAll());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> get(@PathVariable long id){
+    public ResponseEntity<ApiResponse> get(@PathVariable long id) {
         SalesInvoice invoice = this.service.get(id).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", id));
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(invoice, SalesInvoiceDTO.class)));
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse> save(@RequestBody SalesInvoiceDTO dto){
-        SalesInvoice invoice =  this.service.save(dto);
+    public ResponseEntity<ApiResponse> save(@RequestBody SalesInvoiceDTO dto) {
+        SalesInvoice invoice = this.service.save(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(invoice, SalesInvoiceDTO.class)));
     }
 
@@ -75,5 +74,29 @@ public class SalesInvoiceController {
     public ResponseEntity<ApiResponse> removeSalesItemDetailsAndTax(@RequestBody SalesInvoiceDetailDTO dto) {
         SalesInvoiceDetailDTO invoiceDetail = this.service.removeSalesItemDetailsAndTax(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, invoiceDetail));
+    }
+
+    @GetMapping("/to-check")
+    public ResponseEntity<ApiResponse> getInvoicesToCheck() {
+        List<SalesInvoiceDTO> list = this.map(this.service.getAllToCheck());
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
+    }
+
+    @PostMapping("/{id}/check")
+    public ResponseEntity<ApiResponse> checkInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+        dto.setInvoiceId(id);
+        SalesInvoice invoice = this.service.checkInvoice(dto);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
+
+    }
+
+    private List<SalesInvoiceDTO> map(List<SalesInvoice> list) {
+        return list.stream()
+                .map((s) -> this.mapper.getDTO(s, SalesInvoiceDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    private SalesInvoiceDTO map(SalesInvoice invoice){
+        return this.mapper.getDTO(invoice, SalesInvoiceDTO.class);
     }
 }
