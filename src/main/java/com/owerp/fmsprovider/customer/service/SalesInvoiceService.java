@@ -1,9 +1,10 @@
 package com.owerp.fmsprovider.customer.service;
 
 import com.owerp.fmsprovider.customer.data.dto.*;
-import com.owerp.fmsprovider.customer.data.enums.CustomerFormulaType;
-import com.owerp.fmsprovider.customer.data.enums.DocApproveType;
+import com.owerp.fmsprovider.customer.data.enums.*;
 import com.owerp.fmsprovider.customer.data.model.*;
+import com.owerp.fmsprovider.customer.repository.BookEntryRepository;
+import com.owerp.fmsprovider.customer.repository.CustomerInvoiceRepository;
 import com.owerp.fmsprovider.customer.repository.SalesInvoiceRepository;
 import com.owerp.fmsprovider.helper.model.data.AccountingPeriod;
 import com.owerp.fmsprovider.helper.model.data.CostCenter;
@@ -19,23 +20,31 @@ import com.owerp.fmsprovider.supplier.model.enums.NumTypes;
 import com.owerp.fmsprovider.supplier.service.FinNumbersService;
 import com.owerp.fmsprovider.system.advice.EntityNotFoundException;
 import com.owerp.fmsprovider.system.model.data.User;
-import com.owerp.fmsprovider.system.model.dto.UserDTO;
 import com.owerp.fmsprovider.system.service.UserService;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
 public class SalesInvoiceService {
 
     private final SalesInvoiceRepository repo;
+    private final BookEntryRepository bookEntryRepository;
+    private final CustomerInvoiceRepository customerInvoiceRepository;
+
     private final FinNumbersService finNumbersService;
     private final AccountingPeriodService accountingPeriodService;
     private final CustomerTypeService customerTypeService;
@@ -46,8 +55,10 @@ public class SalesInvoiceService {
 
     private final EntityModelMapper mapper;
 
-    public SalesInvoiceService(SalesInvoiceRepository repo, FinNumbersService finNumbersService, AccountingPeriodService accountingPeriodService, CustomerTypeService customerTypeService, CustomerItemService customerItemService, TaxGroupService taxGroupService, CostCenterService costCenterService, UserService userService, EntityModelMapper mapper) {
+    public SalesInvoiceService(SalesInvoiceRepository repo, BookEntryRepository bookEntryRepository, CustomerInvoiceRepository customerInvoiceRepository, FinNumbersService finNumbersService, AccountingPeriodService accountingPeriodService, CustomerTypeService customerTypeService, CustomerItemService customerItemService, TaxGroupService taxGroupService, CostCenterService costCenterService, UserService userService, EntityModelMapper mapper) {
         this.repo = repo;
+        this.bookEntryRepository = bookEntryRepository;
+        this.customerInvoiceRepository = customerInvoiceRepository;
         this.finNumbersService = finNumbersService;
         this.accountingPeriodService = accountingPeriodService;
         this.customerTypeService = customerTypeService;
@@ -62,13 +73,13 @@ public class SalesInvoiceService {
         return this.repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
-    public List<SalesInvoice> getAllToCheck(){
+    public List<SalesInvoice> getAllToCheck() {
         List<SalesInvoice> list = new ArrayList<>(this.repo.getSalesInvoicesByDocApproveType(DocApproveType.NONE));
         list.addAll(this.repo.getSalesInvoicesByDocApproveType(DocApproveType.APPROVE_REJECTED));
         return list;
     }
 
-    public Optional<SalesInvoice> get(long id){
+    public Optional<SalesInvoice> get(long id) {
         return this.repo.findById(id);
     }
 
@@ -264,7 +275,7 @@ public class SalesInvoiceService {
         return result;
     }
 
-    public SalesInvoice checkInvoice(DocumentApproveDTO dto, boolean check){
+    public SalesInvoice checkInvoice(DocumentApproveDTO dto, boolean check) {
         SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
 
         DocApproveType type = check ? DocApproveType.CHECKED : DocApproveType.CHECK_REJECTED;
@@ -277,6 +288,29 @@ public class SalesInvoiceService {
         invoice = this.repo.save(invoice);
 
         //TODO: send sales invoice approval reminder (sendInternalNotificationForCustomerActions)
+        return invoice;
+    }
+
+    public List<SalesInvoice> getAllToApprove() {
+        return this.repo.getSalesInvoicesByDocApproveType(DocApproveType.CHECKED);
+    }
+
+    public SalesInvoice approveInvoice(DocumentApproveDTO dto, boolean approve) {
+
+        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+        invoice.setApproverNote(dto.getNote());
+        invoice.setAuthorizedOn(LocalDateTime.now());
+        invoice.setAuthorizedBy(this.userService.getLoggedInUser());
+
+        DocApproveType type = approve ? DocApproveType.APPROVED : DocApproveType.APPROVE_REJECTED;
+        invoice.setDocApproveType(type);
+
+        invoice = this.repo.save(invoice);
+        if (approve) {
+            BookEntry bookEntry = this.addSalesInvoiceBookEntry(invoice);
+            this.addCustomerInvoice(invoice, bookEntry);
+        }
+
         return invoice;
     }
 
@@ -351,4 +385,147 @@ public class SalesInvoiceService {
             taxDetailsList.add(taxDetailsDTO);
         }
     }
+
+    private BookEntry addSalesInvoiceBookEntry(SalesInvoice salesInvoice) {
+
+        BookEntry bookEntry = new BookEntry();
+        bookEntry.setEntryNumber(salesInvoice.getInvoiceNumber());
+        bookEntry.setEntryDate(LocalDateTime.now());
+        bookEntry.setAuthorized(0);
+        bookEntry.setNote(salesInvoice.getMemo());
+        bookEntry.setBookEntryType(BookEntryType.SALES_INVOICE);
+        bookEntry.setRefId(salesInvoice.getId());
+
+        List<BookEntryDetails> detailsList = new ArrayList<BookEntryDetails>();
+        //Debit
+        BookEntryDetails customerDebit = new BookEntryDetails();
+        customerDebit.setLedgerAccount(salesInvoice.getCustomer().getControlAccount());
+        customerDebit.setAmount(salesInvoice.getTotalAmount());
+        customerDebit.setEntryType(EntryType.DEBIT);
+        customerDebit.setDetails(salesInvoice.getMemo());
+        customerDebit.setCostCenter(salesInvoice.getCostCenter());
+        customerDebit.setBookEntry(bookEntry);
+        detailsList.add(customerDebit);
+
+        //Credit - Customer Items
+        for (SalesInvoiceItem salesInvoiceItem : salesInvoice.getSalesInvoiceItems()) {
+            BookEntryDetails itemCredit = new BookEntryDetails();
+            itemCredit.setLedgerAccount(salesInvoiceItem.getCustomerItem().getLedgerAccount());
+            itemCredit.setAmount(salesInvoiceItem.getAmount());
+            itemCredit.setEntryType(EntryType.CREDIT);
+            itemCredit.setDetails(salesInvoiceItem.getItemDescription());
+            itemCredit.setCostCenter(salesInvoiceItem.getCostCenter());
+            itemCredit.setBookEntry(bookEntry);
+            detailsList.add(itemCredit);
+        }
+        //Credit - TAX
+        for (InvoiceTaxDetails invoiceTaxDetails : salesInvoice.getInvoiceTaxDetails()) {
+            BookEntryDetails taxCredit = new BookEntryDetails();
+            taxCredit.setLedgerAccount(invoiceTaxDetails.getFinTaxType().getControlAccount());
+            taxCredit.setAmount(invoiceTaxDetails.getTaxAmount());
+            taxCredit.setEntryType(EntryType.CREDIT);
+            taxCredit.setDetails("sales invoice " + salesInvoice.getInvoiceNumber());
+            detailsList.add(taxCredit);
+        }
+
+        bookEntry.setBookEntryDetails(detailsList);
+        return bookEntryRepository.save(bookEntry);
+    }
+
+    private void addCustomerInvoice(SalesInvoice salesInvoice, BookEntry bookEntry) {
+
+        CustomerInvoice customerInvoice = new CustomerInvoice();
+        customerInvoice.setAmount(salesInvoice.getTotalAmount());
+        customerInvoice.setToBePaid(salesInvoice.getTotalAmount());
+        customerInvoice.setCustomer(salesInvoice.getCustomer());
+        customerInvoice.setBookEntry(bookEntry);
+        customerInvoice.setCreditPeriod(0);
+        customerInvoice.setInvoiceNumber(salesInvoice.getInvoiceNumber());
+        customerInvoice.setInvoiceDate(salesInvoice.getInvoiceDate());
+        this.customerInvoiceRepository.save(customerInvoice);
+    }
+
+//    @Async
+//    public void emailSalesInvoice(SalesInvoice salesInvoice){
+//        try{
+//            Customer customer = salesInvoice.getCustomer();
+//            List<String> ccList = new ArrayList();
+//            if(customer.getCpEmailNo2() != null){
+//                ccList.add(customer.getCpEmailNo2());
+//            }
+//
+//            if(customer.getCpEmailNo1() != null){
+//                File invoiceFile = generateSalesInvoicePDF(salesInvoice);
+//                if(customer.getCpEmailNo1() != null) {
+//                    Future<Boolean> future = emailServices.sendOutSideEmailEmail(
+//                            salesInvoice.getAuthorizedBy(),
+//                            "Sales invoice " + salesInvoice.getInvoiceNumber(),
+//                            "Please find the attached sales invoice.",
+//                            customer.getCpName1(),
+//                            customer.getCpEmailNo1(),
+//                            invoiceFile,
+//                            ccList
+//                    );
+//                    while (true) { // Update invoice email status
+//                        if (future.isDone() && future.get()) {
+//                            salesInvoice.setEmailSent(true);
+//                            salesInvoice.setEmailSentOn(LocalDateTime.now());
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }catch(Exception e){
+//            LOG.error("[emailSalesInvoice] " + e);
+//        }
+//    }
+//
+//    private File generateSalesInvoicePDF(SalesInvoice salesInvoice){
+//        try {
+//            String sourcePath = "classpath:templates/pages/finance/customer/sales-invoice/print/sales_invoice.jrxml";
+//
+//            if(salesInvoice.getInvoiceType() == InvoiceType.NORMAL){ // Without Tax details
+//                sourcePath = "classpath:templates/pages/finance/customer/sales-invoice/print/sales_invoice_normal.jrxml";
+//            }
+//
+//            File file = ResourceUtils.getFile(sourcePath);
+//
+//            String distPath = "classpath:templates/pages/finance/customer/sales-invoice/print";
+//            File pdfFilePath = ResourceUtils.getFile(distPath);
+//
+//            final InputStream stream = new FileInputStream(file);
+//
+//            final JasperReport report = JasperCompileManager.compileReport(stream);
+//            //final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(new ArrayList<>());
+//            final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(Collections.singleton(salesInvoice));
+//
+//
+//            final Map<String, Object> parameters = new HashMap<>(); //TODO get company details from DB
+//            parameters.put("companyName", CompanyDetails.COMPANY_NAME);
+//            parameters.put("companyAddress", CompanyDetails.COMPANY_ADDRESS);
+//            parameters.put("telephone", CompanyDetails.TELEPHONE);
+//            parameters.put("faxNumber", CompanyDetails.FAX);
+//            parameters.put("ourVAT", CompanyDetails.VAT);
+//
+//            String logoPath = "classpath:static/images/email/companyLogo.png";
+//            File logoFile = ResourceUtils.getFile(logoPath);
+//            parameters.put("logoPath", logoFile.getPath());
+//
+//            //Auth designation
+//            if(salesInvoice.getAuthorizedBy() != null && salesInvoice.getAuthorizedBy().getEmployee() != null && salesInvoice.getAuthorizedBy().getEmployee().getDesignation() != null){
+//                parameters.put("authDesignation", salesInvoice.getAuthorizedBy().getEmployee().getDesignation().getName());
+//            }
+//
+//            final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
+//            final String filePath = pdfFilePath.getPath() + "/Sales_Invoice(" + salesInvoice.getInvoiceNumber()+ ").pdf";
+//            // Export the report to a PDF file.
+//            JasperExportManager.exportReportToPdfFile(print, filePath);
+//
+//            return new File(filePath);
+//
+//        }catch(Exception e){
+//            LOG.error("[generateSalesInvoicePDF] " + e);
+//            return null;
+//        }
+//    }
 }

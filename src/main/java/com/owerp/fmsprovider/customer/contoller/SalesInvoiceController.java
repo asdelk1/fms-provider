@@ -83,7 +83,7 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/{id}/check")
-    public ResponseEntity<ApiResponse> checkInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+    public ResponseEntity<ApiResponse> checkInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto) {
         dto.setInvoiceId(id);
         SalesInvoice invoice = this.service.checkInvoice(dto, true);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
@@ -91,9 +91,29 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<ApiResponse> rejectSalesInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+    public ResponseEntity<ApiResponse> rejectSalesInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto) {
         dto.setInvoiceId(id);
         SalesInvoice invoice = this.service.checkInvoice(dto, false);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
+    }
+
+    @GetMapping("/to-approve")
+    public ResponseEntity<ApiResponse> getInvoicesToApprove() {
+        List<SalesInvoice> list = this.service.getAllToApprove();
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(list)));
+    }
+
+    @PostMapping("/{id}/remove-approval")
+    public ResponseEntity<ApiResponse> removeApproval(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+        dto.setInvoiceId(id);
+        SalesInvoice invoice = this.service.approveInvoice(dto, false);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<ApiResponse> approveSaleInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+        dto.setInvoiceId(id);
+        SalesInvoice invoice = this.service.approveInvoice(dto, true);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
     }
 
@@ -103,7 +123,7 @@ public class SalesInvoiceController {
                 .collect(Collectors.toList());
     }
 
-    private SalesInvoiceDTO map(SalesInvoice invoice){
+    private SalesInvoiceDTO map(SalesInvoice invoice) {
         return this.mapper.getDTO(invoice, SalesInvoiceDTO.class);
     }
 }
