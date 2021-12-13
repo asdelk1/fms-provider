@@ -264,10 +264,12 @@ public class SalesInvoiceService {
         return result;
     }
 
-    public SalesInvoice checkInvoice(DocumentApproveDTO dto){
+    public SalesInvoice checkInvoice(DocumentApproveDTO dto, boolean check){
         SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
 
-        invoice.setDocApproveType(DocApproveType.CHECKED);
+        DocApproveType type = check ? DocApproveType.CHECKED : DocApproveType.CHECK_REJECTED;
+
+        invoice.setDocApproveType(type);
         invoice.setCheckerNote(dto.getNote());
         invoice.setCheckedOn(LocalDateTime.now());
         invoice.setCheckedBy(this.userService.getLoggedInUser());

@@ -85,9 +85,16 @@ public class SalesInvoiceController {
     @PostMapping("/{id}/check")
     public ResponseEntity<ApiResponse> checkInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
         dto.setInvoiceId(id);
-        SalesInvoice invoice = this.service.checkInvoice(dto);
+        SalesInvoice invoice = this.service.checkInvoice(dto, true);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
 
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<ApiResponse> rejectSalesInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
+        dto.setInvoiceId(id);
+        SalesInvoice invoice = this.service.checkInvoice(dto, false);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
     }
 
     private List<SalesInvoiceDTO> map(List<SalesInvoice> list) {
