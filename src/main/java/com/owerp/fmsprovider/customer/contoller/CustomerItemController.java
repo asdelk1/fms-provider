@@ -43,6 +43,12 @@ public class CustomerItemController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(item)));
     }
 
+    @GetMapping("/customer-type/{customerTypeId}")
+    public ResponseEntity<ApiResponse> getByCustomerType(@PathVariable long customerTypeId){
+        List<CustomerItemDTO> list = this.map(this.service.getAllByCustomerType(customerTypeId));
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
+    }
+
     @PostMapping()
     public ResponseEntity<ApiResponse> create(@RequestBody CustomerItemDTO dto){
         CustomerItem item = this.service.save(dto);

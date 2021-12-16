@@ -39,7 +39,7 @@ public class EntityModelMapper {
         for (Field field : dtoClazz.getDeclaredFields()) {
             try {
                 Optional<Field> entityField = Arrays.stream(entityClz.getDeclaredFields()).filter(f -> f.getName().equals(field.getName())).findAny();
-                if (entityField.isPresent()) {
+                if (entityField.isPresent() && !isGenericCollection(field)) {
 
                     // fetch getter and setter
                     String getterName = field.getType().equals(boolean.class) ? "is" + StringUtils.capitalize(field.getName()) :
@@ -92,13 +92,16 @@ public class EntityModelMapper {
         }
     }
 
-
     private Object getRelatedEntity(Class<?> dtoClass, Class<?> entityClass, Object object) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
         Method idGetter = dtoClass.getDeclaredMethod("getId");
         final Long id = (Long) idGetter.invoke(object);
         String repoName = entityClass.getSimpleName() + "Repository";
         JpaRepository<Object, Long> repository = (JpaRepository<Object, Long>) this.applicationContext.getBean(StringUtils.uncapitalize(repoName));
         return repository.getById(id);
+    }
+
+    public boolean isGenericCollection(Field field){
+        return (field.getType().getSimpleName().equals("List"));
     }
 
 }

@@ -18,8 +18,14 @@ public class LedgerTypesService {
     }
 
     @PostConstruct
-    private void initLedgerTypes(){
-        List<LedgerTypes> list = new ArrayList<>();
+    private void initLedgerTypes() {
+
+        List<LedgerTypes> list = this.repo.findAll();
+        if (list.size() > 0) {
+            return;
+        }
+
+        list = new ArrayList<>();
 
         list.add(new LedgerTypes(false, 1, 1, "Revenue"));
         list.add(new LedgerTypes(false, 1, 1, "Other Income"));
