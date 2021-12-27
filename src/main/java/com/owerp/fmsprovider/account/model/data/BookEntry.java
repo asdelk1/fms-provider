@@ -1,4 +1,4 @@
-package com.owerp.fmsprovider.customer.data.model;
+package com.owerp.fmsprovider.account.model.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.owerp.fmsprovider.customer.data.enums.BookEntryType;

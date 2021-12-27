@@ -1,7 +1,9 @@
-package com.owerp.fmsprovider.customer.data.model;
+package com.owerp.fmsprovider.account.model.data;
 
 import com.owerp.fmsprovider.customer.data.enums.EntryType;
 import com.owerp.fmsprovider.customer.data.enums.RecType;
+import com.owerp.fmsprovider.customer.data.model.Customer;
+import com.owerp.fmsprovider.customer.data.model.PersonType;
 import com.owerp.fmsprovider.helper.model.data.CostCenter;
 import com.owerp.fmsprovider.ledger.model.data.LedgerAccount;
 import com.owerp.fmsprovider.supplier.model.data.Supplier;

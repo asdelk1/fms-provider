@@ -1,6 +1,7 @@
-package com.owerp.fmsprovider.customer.data.dto;
+package com.owerp.fmsprovider.account.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.owerp.fmsprovider.customer.data.dto.CustomerDTO;
 import com.owerp.fmsprovider.customer.data.enums.EntryType;
 import com.owerp.fmsprovider.customer.data.enums.RecType;
 import com.owerp.fmsprovider.customer.data.model.PersonType;
@@ -12,7 +13,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BookEntryDetailsDTO {
+public class StandingJeDetailsDTO {
 
     private Long id;
     private LedgerAccountDTO ledgerAccount;
@@ -23,7 +24,7 @@ public class BookEntryDetailsDTO {
     private CostCenterDTO costCenter;
     private Integer chk; // for budget creating
     @JsonIgnore
-    private BookEntryDTO bookEntry;
+    private StandingJeDTO bookEntry;
     private CustomerDTO customer;
     private SupplierDTO supplier;
     private PersonType personType;

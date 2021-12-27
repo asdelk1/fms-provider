@@ -27,7 +27,13 @@ public class SupplierController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> listAll(){
-        List<SupplierDTO> list = this.service.getAll().stream().map(s -> this.mapper.getDTO(s, SupplierDTO.class)).collect(Collectors.toList());
+        List<SupplierDTO> list = this.map(this.service.getAll());
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse> listAllActive(){
+        List<SupplierDTO> list = this.map(this.service.getAllActive());
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, list));
     }
 
@@ -41,5 +47,9 @@ public class SupplierController {
     public ResponseEntity<ApiResponse> create(@RequestBody SupplierDTO dto){
         Supplier supplier = this.service.save(dto);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.mapper.getDTO(supplier, SupplierDTO.class)));
+    }
+
+    private List<SupplierDTO> map(List<Supplier> list){
+        return list.stream().map(s -> this.mapper.getDTO(s, SupplierDTO.class)).collect(Collectors.toList());
     }
 }
