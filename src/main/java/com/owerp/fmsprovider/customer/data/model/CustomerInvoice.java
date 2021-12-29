@@ -1,5 +1,6 @@
 package com.owerp.fmsprovider.customer.data.model;
 
+import com.owerp.fmsprovider.account.model.data.BookEntry;
 import com.owerp.fmsprovider.customer.data.enums.InvoicePaymentStatus;
 import lombok.Getter;
 import lombok.Setter;

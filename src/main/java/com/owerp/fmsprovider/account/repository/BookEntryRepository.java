@@ -1,8 +1,8 @@
-package com.owerp.fmsprovider.customer.repository;
+package com.owerp.fmsprovider.account.repository;
 
 import com.owerp.fmsprovider.customer.data.enums.BookEntryType;
 import com.owerp.fmsprovider.customer.data.enums.DocApproveType;
-import com.owerp.fmsprovider.customer.data.model.BookEntry;
+import com.owerp.fmsprovider.account.model.data.BookEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

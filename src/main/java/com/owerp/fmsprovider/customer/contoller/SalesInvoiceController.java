@@ -84,7 +84,7 @@ public class SalesInvoiceController {
 
     @PostMapping("/{id}/check")
     public ResponseEntity<ApiResponse> checkInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto) {
-        dto.setInvoiceId(id);
+        dto.setEntryId(id);
         SalesInvoice invoice = this.service.checkInvoice(dto, true);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
 
@@ -92,7 +92,7 @@ public class SalesInvoiceController {
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<ApiResponse> rejectSalesInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto) {
-        dto.setInvoiceId(id);
+        dto.setEntryId(id);
         SalesInvoice invoice = this.service.checkInvoice(dto, false);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
     }
@@ -105,14 +105,14 @@ public class SalesInvoiceController {
 
     @PostMapping("/{id}/remove-approval")
     public ResponseEntity<ApiResponse> removeApproval(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
-        dto.setInvoiceId(id);
+        dto.setEntryId(id);
         SalesInvoice invoice = this.service.approveInvoice(dto, false);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
     }
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<ApiResponse> approveSaleInvoice(@PathVariable long id, @RequestBody DocumentApproveDTO dto){
-        dto.setInvoiceId(id);
+        dto.setEntryId(id);
         SalesInvoice invoice = this.service.approveInvoice(dto, true);
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(invoice)));
     }

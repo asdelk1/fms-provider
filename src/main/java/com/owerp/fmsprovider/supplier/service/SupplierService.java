@@ -31,6 +31,10 @@ public class SupplierService {
         return this.repo.findAll();
     }
 
+    public List<Supplier> getAllActive(){
+        return this.repo.findAllByStatusIsTrue();
+    }
+
     public Optional<Supplier> get(Long id) {
         return this.repo.findById(id);
     }

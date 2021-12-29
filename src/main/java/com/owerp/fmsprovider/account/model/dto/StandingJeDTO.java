@@ -1,19 +1,17 @@
-package com.owerp.fmsprovider.customer.data.dto;
+package com.owerp.fmsprovider.account.model.dto;
 
 import com.owerp.fmsprovider.customer.data.enums.BookEntryType;
 import com.owerp.fmsprovider.customer.data.enums.DocApproveType;
-import com.owerp.fmsprovider.system.model.dto.UserDTO;
+import com.owerp.fmsprovider.system.model.data.User;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Getter
 @Setter
-public class BookEntryDTO {
-
+public class StandingJeDTO {
     private Long id;
     private String entryNumber;
     private LocalDateTime entryDate;
@@ -23,20 +21,19 @@ public class BookEntryDTO {
     private BookEntryType bookEntryType;
 
     private Integer deposited=0; // 0- undeposited, 1- deposited
-    private List<BookEntryDetailsDTO> bookEntryDetails;
+    private List<StandingJeDetailsDTO> bookEntryDetails;
     private Long refId;
 
     private DocApproveType docApproveType = DocApproveType.NONE;
-    private UserDTO enteredBy;
+    private User enteredBy;
     private LocalDateTime enteredOn;
 
-    private UserDTO checkedBy;
+    private User checkedBy;
     private LocalDateTime checkedOn;
     private String checkerNote;
 
-    private UserDTO authorizedBy;
+    private User authorizedBy;
     private LocalDateTime authorizedOn;
     private String approverNote;
 
-    private boolean saveAsSje;
 }

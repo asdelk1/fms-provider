@@ -1,5 +1,6 @@
 package com.owerp.fmsprovider.customer.data.dto;
 
+import com.owerp.fmsprovider.account.model.dto.BookEntryDTO;
 import com.owerp.fmsprovider.customer.data.enums.InvoicePaymentStatus;
 import lombok.Getter;
 import lombok.Setter;

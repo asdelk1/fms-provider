@@ -1,9 +1,11 @@
 package com.owerp.fmsprovider.customer.service;
 
+import com.owerp.fmsprovider.account.model.data.BookEntry;
+import com.owerp.fmsprovider.account.model.data.BookEntryDetails;
 import com.owerp.fmsprovider.customer.data.dto.*;
 import com.owerp.fmsprovider.customer.data.enums.*;
 import com.owerp.fmsprovider.customer.data.model.*;
-import com.owerp.fmsprovider.customer.repository.BookEntryRepository;
+import com.owerp.fmsprovider.account.repository.BookEntryRepository;
 import com.owerp.fmsprovider.customer.repository.CustomerInvoiceRepository;
 import com.owerp.fmsprovider.customer.repository.SalesInvoiceRepository;
 import com.owerp.fmsprovider.helper.model.data.AccountingPeriod;
@@ -24,18 +26,12 @@ import com.owerp.fmsprovider.system.service.UserService;
 import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 @Service
@@ -276,7 +272,7 @@ public class SalesInvoiceService {
     }
 
     public SalesInvoice checkInvoice(DocumentApproveDTO dto, boolean check) {
-        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+        SalesInvoice invoice = this.get(dto.getEntryId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getEntryId()));
 
         DocApproveType type = check ? DocApproveType.CHECKED : DocApproveType.CHECK_REJECTED;
 
@@ -297,7 +293,7 @@ public class SalesInvoiceService {
 
     public SalesInvoice approveInvoice(DocumentApproveDTO dto, boolean approve) {
 
-        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+        SalesInvoice invoice = this.get(dto.getEntryId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getEntryId()));
         invoice.setApproverNote(dto.getNote());
         invoice.setAuthorizedOn(LocalDateTime.now());
         invoice.setAuthorizedBy(this.userService.getLoggedInUser());
