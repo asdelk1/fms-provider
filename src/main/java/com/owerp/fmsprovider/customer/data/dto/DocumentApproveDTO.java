@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class DocumentApproveDTO {
 
-    private Long invoiceId;
+    private Long entryId;
     private String note;
     private boolean sendEmail;
 

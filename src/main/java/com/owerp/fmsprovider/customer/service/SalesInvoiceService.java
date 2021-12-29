@@ -272,7 +272,7 @@ public class SalesInvoiceService {
     }
 
     public SalesInvoice checkInvoice(DocumentApproveDTO dto, boolean check) {
-        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+        SalesInvoice invoice = this.get(dto.getEntryId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getEntryId()));
 
         DocApproveType type = check ? DocApproveType.CHECKED : DocApproveType.CHECK_REJECTED;
 
@@ -293,7 +293,7 @@ public class SalesInvoiceService {
 
     public SalesInvoice approveInvoice(DocumentApproveDTO dto, boolean approve) {
 
-        SalesInvoice invoice = this.get(dto.getInvoiceId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getInvoiceId()));
+        SalesInvoice invoice = this.get(dto.getEntryId()).orElseThrow(() -> new EntityNotFoundException("Sales Invoice", dto.getEntryId()));
         invoice.setApproverNote(dto.getNote());
         invoice.setAuthorizedOn(LocalDateTime.now());
         invoice.setAuthorizedBy(this.userService.getLoggedInUser());
