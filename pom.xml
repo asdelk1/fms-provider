@@ -89,6 +89,20 @@
             <artifactId>thymeleaf-layout-dialect</artifactId>
         </dependency>
 
+        <!-- Jasper print dependency. -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.12.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.12.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

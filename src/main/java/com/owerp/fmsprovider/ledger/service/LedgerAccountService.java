@@ -10,6 +10,7 @@ import com.owerp.fmsprovider.system.util.EntityModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,20 +39,24 @@ public class LedgerAccountService {
         return this.repo.findById(id);
     }
 
-    public LedgerAccount save(LedgerAccountDTO dto){
+    public LedgerAccount save(LedgerAccountDTO dto) {
         LedgerAccount account = this.mapper.getEntity(dto, LedgerAccount.class);
         return this.repo.save(account);
     }
 
-    public List<LedgerCategory> getAllActiveCategories(){
+    public List<LedgerAccount> getAllByCategory(LedgerCategory category) {
+        return this.repo.getAllByLedgerCategory(category);
+    }
+
+    public List<LedgerCategory> getAllActiveCategories() {
         return this.categoryRepository.findAllByStatusIsTrue();
     }
 
-    public Optional<LedgerCategory> getLedgerCategory(long id){
+    public Optional<LedgerCategory> getLedgerCategory(long id) {
         return this.categoryRepository.findById(id);
     }
 
-    public LedgerCategory saveLedgerCategory(LedgerCategoryDTO dto){
+    public LedgerCategory saveLedgerCategory(LedgerCategoryDTO dto) {
         LedgerCategory category = this.mapper.getEntity(dto, LedgerCategory.class);
         return this.categoryRepository.save(category);
     }

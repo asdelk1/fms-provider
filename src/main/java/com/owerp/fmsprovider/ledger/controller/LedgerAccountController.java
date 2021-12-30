@@ -72,6 +72,13 @@ public class LedgerAccountController {
         return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, category));
     }
 
+    @GetMapping("/categories/{id}/accounts")
+    public ResponseEntity<ApiResponse> getAccountsForLedgerCategory(@PathVariable long id){
+        LedgerCategory category = this.service.getLedgerCategory(id).orElseThrow(()-> new EntityNotFoundException("Ledger Category", id));
+        List<LedgerAccount> accounts = this.service.getAllByCategory(category);
+        return ResponseEntity.ok(new ApiResponse(HttpStatus.OK, this.map(accounts)));
+    }
+
     @GetMapping("/categories/active")
     public ResponseEntity<ApiResponse> getLedgerCategory(){
         List<LedgerCategoryDTO> list = this.service.getAllActiveCategories().stream().map((c)-> this.mapper.getDTO(c, LedgerCategoryDTO.class)).collect(Collectors.toList());
