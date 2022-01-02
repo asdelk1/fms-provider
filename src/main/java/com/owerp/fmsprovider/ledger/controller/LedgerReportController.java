@@ -4,7 +4,6 @@ package com.owerp.fmsprovider.ledger.controller;
 import com.owerp.fmsprovider.ledger.model.dto.ReportData;
 import com.owerp.fmsprovider.ledger.service.LedgerReportService;
 import com.owerp.fmsprovider.system.advice.ApplicationException;
-import com.owerp.fmsprovider.system.model.dto.ApiResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +19,39 @@ import java.io.InputStream;
 @RestController("/ledger-reports")
 public class LedgerReportController {
 
+    private final LedgerReportService service;
 
-    private LedgerReportService service;
+    public LedgerReportController(LedgerReportService service) {
+        this.service = service;
+    }
 
-    @PostMapping()
+    @PostMapping("/general-report")
     public ResponseEntity<InputStream> generateLedgerReport(@RequestBody ReportData data) {
 
         try {
             File report = this.service.genGeneralLedgerReport(data);
+            InputStream is = new FileInputStream(report);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline");
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(is);
+
+
+        } catch (FileNotFoundException e) {
+            String message = "File not found: " + e.getMessage();
+            throw new ApplicationException(message);
+        }
+    }
+
+    @PostMapping("/trail-balance")
+    public ResponseEntity<InputStream> generateTrailBalance(@RequestBody ReportData data) {
+
+        try {
+            File report = this.service.genTrailBalanceReport(data);
             InputStream is = new FileInputStream(report);
 
             HttpHeaders headers = new HttpHeaders();

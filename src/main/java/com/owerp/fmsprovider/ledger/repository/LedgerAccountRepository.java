@@ -13,4 +13,6 @@ public interface LedgerAccountRepository extends JpaRepository<LedgerAccount, Lo
     List<LedgerAccount> findAllByStatusIsTrue();
 
     List<LedgerAccount> getAllByLedgerCategory(LedgerCategory ledgerCategory);
+
+    List<LedgerAccount> getLedgerAccountsByStatusOrderByLedgerAccCode(Boolean status);
 }

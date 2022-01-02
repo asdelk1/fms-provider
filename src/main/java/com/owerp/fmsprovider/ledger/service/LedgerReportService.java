@@ -6,6 +6,8 @@ import com.owerp.fmsprovider.customer.data.enums.EntryType;
 import com.owerp.fmsprovider.ledger.model.data.LedgerAccount;
 import com.owerp.fmsprovider.ledger.model.dto.GeneralLedger;
 import com.owerp.fmsprovider.ledger.model.dto.ReportData;
+import com.owerp.fmsprovider.ledger.model.dto.TrailBalance;
+import com.owerp.fmsprovider.ledger.repository.LedgerAccountRepository;
 import com.owerp.fmsprovider.system.advice.ApplicationException;
 import com.owerp.fmsprovider.system.util.ApplicationProperties;
 import net.sf.jasperreports.engine.*;
@@ -29,14 +31,98 @@ public class LedgerReportService {
 
     private final LedgerAccountService ledgerAccountService;
     private final BookEntryDetailsRepository bookEntryDetailsRepository;
+    private final LedgerAccountRepository ledgerAccountRepository;
 
-    public LedgerReportService(LedgerAccountService ledgerAccountService, BookEntryDetailsRepository bookEntryDetailsRepository) {
+    public LedgerReportService(LedgerAccountService ledgerAccountService, BookEntryDetailsRepository bookEntryDetailsRepository, LedgerAccountRepository ledgerAccountRepository) {
         this.ledgerAccountService = ledgerAccountService;
         this.bookEntryDetailsRepository = bookEntryDetailsRepository;
+        this.ledgerAccountRepository = ledgerAccountRepository;
+    }
+
+    public File genTrailBalanceReport(ReportData reportData) {
+        return genTrailBalanceReportPDF(reportData);
     }
 
     public File genGeneralLedgerReport(ReportData reportData) {
         return genGeneralLedgerReportPDF(reportData);
+    }
+
+    private File genTrailBalanceReportPDF(ReportData reportData) {
+        try {
+
+            String sourcePath = "classpath:templates/reports/ledger/TrailBalanceReport.jrxml";
+            File file = ResourceUtils.getFile(sourcePath);
+
+            String distPath = "classpath:templates/pages/reports/ledger";
+            File pdfFilePath = ResourceUtils.getFile(distPath);
+
+            final InputStream stream = new FileInputStream(file);
+
+            Object[] res = generateTbList(reportData);
+
+            final JasperReport report = JasperCompileManager.compileReport(stream);
+            //final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(new ArrayList<>());
+            final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource((List<GeneralLedger>)res[0]);
+
+            final JasperPrint print = JasperFillManager.fillReport(report, (Map<String, Object>)res[1], source);
+            final String filePath = pdfFilePath.getPath() + "/TrailBalance.pdf";
+            // Export the report to a PDF file.
+            JasperExportManager.exportReportToPdfFile(print, filePath);
+
+            return new File(filePath);
+        } catch (Exception e) {
+           throw new ApplicationException(e.getMessage());
+        }
+    }
+
+    private Object[] generateTbList(ReportData reportData)throws Exception{
+        Object[] res = new Object[2];
+        try{
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime endDateTime = LocalDate.parse(reportData.getFromDate(), formatter).atTime(23, 59);
+            List<TrailBalance> list=new ArrayList<TrailBalance>();
+
+            List<LedgerAccount> accList=ledgerAccountRepository.getLedgerAccountsByStatusOrderByLedgerAccCode(true);
+            for(LedgerAccount acc :accList){
+                TrailBalance tb=new TrailBalance();
+                tb.setSubACName(acc.getLedgerAccName());
+                tb.setSubAcNumber(acc.getLedgerAccCode());
+                double closingBal=getGLOpeningBalance(endDateTime, acc.getId(), acc.getLedgerCategory().getLedgerType().getClarifi());
+
+                if(acc.getLedgerCategory().getLedgerType().getClarifi().equals("D")){
+                    if(closingBal >=0){
+                        tb.setDebitAmount(closingBal);
+                        tb.setCreditAmount(0.00);
+                    }
+                    else{
+                        tb.setDebitAmount(0.00);
+                        tb.setCreditAmount((closingBal * -1));
+                    }
+                }
+                else if(acc.getLedgerCategory().getLedgerType().getClarifi().equals("C")){
+                    if(closingBal >=0){
+                        tb.setDebitAmount(0.00);
+                        tb.setCreditAmount(closingBal);
+                    }
+                    else{
+                        tb.setDebitAmount((closingBal * -1));
+                        tb.setCreditAmount(0.00);
+                    }
+                }
+                tb.setAccId(acc.getId());
+                list.add(tb);
+            }
+            res[0] = list;
+            final Map<String, Object> parameters = new HashMap<>();
+            parameters.put("companyName", ApplicationProperties.COMPANY_NAME);
+            parameters.put("endDate", endDateTime);
+            res[1] = parameters;
+
+        }catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+        return res;
+
     }
 
     private File genGeneralLedgerReportPDF(ReportData reportData) {
